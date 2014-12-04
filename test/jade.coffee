@@ -16,7 +16,7 @@ describe 'jade', ->
     @jade.name.should.be.ok
 
   it 'should render a string', (done) ->
-    @jade.render('p BLAHHHHH\np= foo', { foo: 'such options' })
+    @jade.render('p BLAHHHHH\np= foo', foo: 'such options')
       .done((res) => should.match_expected(@jade, res, path.join(@path, 'rstring.jade'), done))
 
   it 'should render a file', (done) ->
@@ -80,3 +80,17 @@ describe 'jade', ->
       _.uniq(res).length.should.equal(res.length)
       done()
     .catch(done)
+
+  it 'should record deps', (done) ->
+    lpath = path.join(@path, 'block-inheritance-extender.jade')
+    @jade.renderFile(lpath).done (job) =>
+      deps = [
+        path.join(@path, 'block-inheritance-extender.jade')
+        path.join(@path, 'block-inheritance-template.jade')
+        path.join(@path, 'partial.jade')
+        path.join(@path, '_partial_content.jade')
+      ]
+      for dep in deps
+        job.dependencies.should.containEql(dep)
+      console.log job
+      done()
